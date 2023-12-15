@@ -3,7 +3,8 @@
 #include "Effect.h"
 namespace dae
 {
-	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex_PosCol>& vertices, const std::vector<uint32_t>& indices)
+	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex_PosCol>& vertices, const std::vector<uint32_t>& indices):
+		m_pVertexBuffer(nullptr), m_pInputLayout(nullptr)
 	{
 		// Create Effect
 		m_pEffect = new Effect(pDevice, L"./Resources/PosCol3D.fx");
@@ -74,7 +75,7 @@ namespace dae
 		m_pEffect = nullptr;
 	}
 
-	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix) const
+	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix,Texture* myTexture) const
 	{
 		m_pEffect->UpdateViewProjectionMatrix(viewProjectionMatrix);
 
@@ -87,11 +88,15 @@ namespace dae
 		pDeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		D3DX11_TECHNIQUE_DESC techDesc{};
+		m_pEffect->SetDiffuseMap(myTexture);
 		m_pEffect->GetTechnique()->GetDesc(&techDesc);
+		
 		for (UINT p = 0; p < techDesc.Passes; ++p)
 		{
+		
 			m_pEffect->GetTechnique()->GetPassByIndex(p)->Apply(0, pDeviceContext);
 			pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
+			
 		}
 	}
 };

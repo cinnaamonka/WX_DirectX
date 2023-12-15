@@ -15,7 +15,7 @@ namespace dae
 		Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
 		~Effect();
 		void UpdateViewProjectionMatrix(const Matrix* viewProjectionMatrix);
-		void SetDiffuseMap(Texture* pDiffuseTexture);
+		bool SetDiffuseMap(Texture* pDiffuseTexture);
 
 
 		ID3DX11Effect* GetEffect() const;

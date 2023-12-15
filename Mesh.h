@@ -25,6 +25,6 @@ namespace dae
 		Mesh() = default;
 		Mesh(ID3D11Device* pDevice, const std::vector<Vertex_PosCol>& vertices, const std::vector<uint32_t>& indices);
 		~Mesh();
-		void Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix) const;
+		void Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix, Texture* myTexture) const;
 	};
 }

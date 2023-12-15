@@ -7,6 +7,7 @@ class Mesh;
 
 #include "Mesh.h"
 #include "Camera.h"
+#include "Texture.h"
 namespace dae
 {
 	class Renderer final
@@ -43,5 +44,7 @@ namespace dae
 		Mesh* m_pMesh;
 
 		Camera* m_pCamera;
+
+		Texture* m_pMyTexture;
 	};
 }

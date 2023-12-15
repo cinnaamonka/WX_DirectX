@@ -6,7 +6,7 @@
 
 namespace dae {
 
-	Renderer::Renderer(SDL_Window* pWindow, Camera* pCamera):
+	Renderer::Renderer(SDL_Window* pWindow, Camera* pCamera) :
 		m_pWindow(pWindow), m_pCamera(pCamera)
 	{
 		//Initialize
@@ -20,13 +20,17 @@ namespace dae {
 			std::cout << "DirectX is initialized and ready!\n";
 			const std::vector<Vertex_PosCol> vertices
 			{
-				{{.0f, .5f, .5f}, {1.f, 0.f, 0.f}},
-				{{.5f, -.5f, .5f}, {0.f, 0.f, 1.f}},
-				{{-.5f, -.5f, .5f}, {0.f, 1.f, 0.f}},
+				 {{-0.5f, 0.5f, 0.5f}, {1.f, 0.f, 0.f}},
+				 {{0.5f, 0.5f, 0.5f}, {0.f, 1.f, 0.f}},
+				 {{-0.5f, -0.5f, 0.5f}, {0.f, 0.f, 1.f}},
+				 {{0.5f, -0.5f, 0.5f}, {1.f, 1.f, 0.f}}
 			};
 			const std::vector<uint32_t> indices{ 0, 1, 2 };
 			// ReSharper disable once CppObjectMemberMightNotBeInitialized
 			m_pMesh = new Mesh(m_pDevice, vertices, indices);
+
+			m_pMyTexture = new Texture();
+			m_pMyTexture->LoadFromFile("Resources/uv_grid_2.png", m_pDevice);
 		}
 		else
 		{
@@ -53,11 +57,17 @@ namespace dae {
 			m_pDeviceContext->Release();
 		}
 		if (m_pDevice) m_pDevice->Release();
+
+		if (m_pMyTexture)
+		{
+			delete m_pMyTexture;
+			m_pMyTexture = nullptr;
+		}
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-
+		m_pCamera->Update(pTimer);
 	}
 
 
@@ -73,7 +83,7 @@ namespace dae {
 
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
 		const auto matrix = m_pCamera->ViewProjectionMatrix();
-		m_pMesh->Render(m_pDeviceContext, &matrix);
+		m_pMesh->Render(m_pDeviceContext, &matrix, m_pMyTexture);
 
 		// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);

@@ -70,12 +70,14 @@ namespace dae
 	{
 		return m_pTechnique;
 	}
-	void Effect::SetDiffuseMap(Texture* pDiffuseTexture)
+	bool Effect::SetDiffuseMap(Texture* pDiffuseTexture)
 	{
 		if (m_pDiffuseVariable)
 		{
 			m_pDiffuseVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
+			return true;
 		}
+		return false;
 	}
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	{

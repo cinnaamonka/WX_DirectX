@@ -4,33 +4,37 @@ Texture2D gDiffuseMap : DiffuseMap;
 struct VS_INPUT
 {
     float3 Position : POSITION;
-    float2 TexCoord : TEXCOORD0;  // Add texture coordinates
-    float3 Color : COLOR;
+    float4 Color : COLOR;
+    float2 TexCoord : TEXCOORD0;
 };
 
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float2 TexCoord : TEXCOORD0;  // Pass texture coordinates to the pixel shader
-    float3 Color : COLOR;
+    float4 Color : COLOR;
+    float2 TexCoord : TEXCOORD0;
 };
+
 
 VS_OUTPUT VS(VS_INPUT input)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
     output.Position = mul(float4(input.Position, 1.f), worldViewProjection);
-    output.TexCoord = input.TexCoord;  // Pass texture coordinates
     output.Color = input.Color;
+    output.TexCoord = input.TexCoord;
     return output;
 }
+SamplerState samPoint
+{
+    Filter = MIN_MAG_MIP_POINT;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
 
 float4 PS(VS_OUTPUT input) : SV_TARGET
 {
-    // Use the texture coordinates for sampling a texture
-    float4 textureColor = input.TexCoord;
-    
-    // Multiply the texture color with the input color
-    return float4(input.Color * textureColor.rgb, textureColor.a);
+    float4 color = gDiffuseMap.Sample(samPoint, input.TexCoord) * input.Color;
+    return color;
 }
 
 technique11 DefaultTechnique
@@ -43,10 +47,3 @@ technique11 DefaultTechnique
     }
 }
 
-SamplerState samPoint
-{
-    Filter = MIN_MAG_MIP_POINT;
-    AdressU = Wrap;// Or Mirror,Clamp,Border
-    AdressV = Wrap;
-
-};
