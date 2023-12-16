@@ -8,19 +8,18 @@ namespace dae
 	private:
 		ID3DX11Effect* m_pEffect;
 		ID3DX11EffectTechnique* m_pTechnique;
-		ID3DX11EffectShaderResourceVariable* m_pDiffuseVariable;
 
 	public:
 		Effect() = default;
 		Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
 		~Effect();
 		void UpdateViewProjectionMatrix(const Matrix* viewProjectionMatrix);
-		bool SetDiffuseMap(Texture* pDiffuseTexture);
 
 
 		ID3DX11Effect* GetEffect() const;
 		ID3DX11EffectTechnique* GetTechnique() const;
 		ID3DX11EffectMatrixVariable* m_pViewProjectionMatrix = nullptr;
+		ID3DX11EffectVariable* GetVariableByName(const std::string& name) const;
 	};
 
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);

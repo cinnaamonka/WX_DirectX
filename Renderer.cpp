@@ -11,26 +11,27 @@ namespace dae {
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
-
+		m_pCamera->Initialize(45.0f,90.f, Vector3{ 0.0f, 0.0f ,-10.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
 		if (result == S_OK)
 		{
 			m_IsInitialized = true;
 			std::cout << "DirectX is initialized and ready!\n";
-			const std::vector<Vertex_PosCol> vertices
+			const std::vector<Vertex> vertices
 			{
-				 {{-0.5f, 0.5f, 0.5f}, {1.f, 0.f, 0.f}},
-				 {{0.5f, 0.5f, 0.5f}, {0.f, 1.f, 0.f}},
-				 {{-0.5f, -0.5f, 0.5f}, {0.f, 0.f, 1.f}},
-				 {{0.5f, -0.5f, 0.5f}, {1.f, 1.f, 0.f}}
+				Vertex{{-3,  3, -2}, {}, {0, 0}}, 
+				Vertex{{ 3,  3, -2}, {}, {1, 0}}, 
+				Vertex{{-3, -3, -2}, {}, {0, 1}}, 
+				Vertex{{ 3, -3, -2}, {}, {1, 1}} 
 			};
-			const std::vector<uint32_t> indices{ 0, 1, 2 };
+			std::vector<uint32_t> indices{ 0, 1,  2, 2, 1, 3 };
 			// ReSharper disable once CppObjectMemberMightNotBeInitialized
 			m_pMesh = new Mesh(m_pDevice, vertices, indices);
 
 			m_pMyTexture = new Texture();
 			m_pMyTexture->LoadFromFile("Resources/uv_grid_2.png", m_pDevice);
+			m_pMesh->SetDiffuseMap(m_pMyTexture);
 		}
 		else
 		{

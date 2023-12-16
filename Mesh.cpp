@@ -3,11 +3,18 @@
 #include "Effect.h"
 namespace dae
 {
-	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex_PosCol>& vertices, const std::vector<uint32_t>& indices):
+	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices):
 		m_pVertexBuffer(nullptr), m_pInputLayout(nullptr)
 	{
 		// Create Effect
 		m_pEffect = new Effect(pDevice, L"./Resources/PosCol3D.fx");
+
+		m_pDiffuseVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
+
+		if (!m_pDiffuseVariable->IsValid())
+		{
+			std::wcout << L"m_pDiffuseVariable is not valid" << std::endl;
+		}
 
 		// Create Vertex Layout
 		static constexpr uint32_t numElements{ 2 };
@@ -26,7 +33,7 @@ namespace dae
 		// Create Vertex Buffer
 		D3D11_BUFFER_DESC bd = {};
 		bd.Usage = D3D11_USAGE_IMMUTABLE;
-		bd.ByteWidth = sizeof(Vertex_PosCol) * static_cast<uint32_t>(vertices.size());
+		bd.ByteWidth = sizeof(Vertex) * static_cast<uint32_t>(vertices.size());
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 		bd.MiscFlags = 0;
@@ -64,7 +71,15 @@ namespace dae
 		if (FAILED(result))
 			return;
 	}
-
+	bool Mesh::SetDiffuseMap(Texture* pDiffuseTexture)
+	{
+		if (pDiffuseTexture)
+		{
+			m_pDiffuseVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
+			return true;
+		}
+		return false;
+	}
 	Mesh::~Mesh()
 	{
 		// TODO: initialize destruct sequence
@@ -73,6 +88,7 @@ namespace dae
 		if (m_pVertexBuffer) m_pVertexBuffer->Release();
 		delete m_pEffect;
 		m_pEffect = nullptr;
+		if (m_pDiffuseVariable) m_pDiffuseVariable->Release();
 	}
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix,Texture* myTexture) const
@@ -81,14 +97,13 @@ namespace dae
 
 		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pDeviceContext->IASetInputLayout(m_pInputLayout);
-		constexpr UINT stride = sizeof(Vertex_PosCol);
+		constexpr UINT stride = sizeof(Vertex);
 		constexpr UINT offset = 0;
 		pDeviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
 
 		pDeviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		D3DX11_TECHNIQUE_DESC techDesc{};
-		m_pEffect->SetDiffuseMap(myTexture);
 		m_pEffect->GetTechnique()->GetDesc(&techDesc);
 		
 		for (UINT p = 0; p < techDesc.Passes; ++p)

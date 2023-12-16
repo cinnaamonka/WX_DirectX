@@ -29,14 +29,6 @@ namespace dae
 			std::wcout << L"ViewProjectionMatrix is not valid" << std::endl;
 		}
 		
-		m_pDiffuseVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
-
-		if (!m_pDiffuseVariable->IsValid())
-		{
-			std::wcout << L"m_pDiffuseVariable is not valid" << std::endl;
-		}
-		
-
 	}
 
 	Effect::~Effect()
@@ -44,7 +36,10 @@ namespace dae
 		m_pEffect->Release();
 		m_pEffect = nullptr;
 	}
-	
+	ID3DX11EffectVariable* Effect::GetVariableByName(const std::string& name) const
+	{
+		return m_pEffect->GetVariableByName(name.c_str());
+	}
 	ID3DX11Effect* Effect::GetEffect() const
 	{
 		return m_pEffect;
@@ -70,15 +65,7 @@ namespace dae
 	{
 		return m_pTechnique;
 	}
-	bool Effect::SetDiffuseMap(Texture* pDiffuseTexture)
-	{
-		if (m_pDiffuseVariable)
-		{
-			m_pDiffuseVariable->SetResource(pDiffuseTexture->GetShaderResourceView());
-			return true;
-		}
-		return false;
-	}
+	
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	{
 		HRESULT result;

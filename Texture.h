@@ -17,7 +17,7 @@ namespace dae
 		Texture();
 		~Texture();
 		static void LoadFromFile(const std::string& path, ID3D11Device* device);
-		ID3D11ShaderResourceView* GetShaderResourceView() const;
+		inline ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; };
 		class ReadEmptytexture : public std::exception
 		{
 		public:
