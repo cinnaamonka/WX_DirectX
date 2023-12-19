@@ -67,7 +67,6 @@ namespace dae
 
 			ProjectionMatrix = Matrix::CreatePerspectiveFovLH(fov, aspectRatioVar, nearPlane, farPlane);
 			worldViewProectionMatrix = invViewMatrix * ProjectionMatrix;
-			//DirectX Implementation => https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxmatrixperspectivefovlh
 		}
 
 		Matrix GetViewMatrix() const 
