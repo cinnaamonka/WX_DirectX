@@ -13,8 +13,8 @@ namespace dae
 		Vector3  position = { 0.0f,0.0f, 0.0f };
 		ColorRGB color = colors::White;
 		Vector2  uv = { 0.0f, 1.0f };
-		Vector3  normal = { 0.0f, 0.0f, 1.0f };
-		Vector3  tangent = { 0.0f, 0.0f, 1.0f };
+		//Vector3  normal = { 0.0f, 0.0f, 1.0f };
+		//Vector3  tangent = { 0.0f, 0.0f, 1.0f };
 	};
 
 	class Mesh

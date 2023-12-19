@@ -17,7 +17,7 @@ namespace dae
 		}
 
 		// Create Vertex Layout
-		static constexpr uint32_t numElements{ 2 };
+		static constexpr uint32_t numElements{ 3 };
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
 
 		vertexDesc[0].SemanticName = "POSITION";
@@ -29,6 +29,11 @@ namespace dae
 		vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		vertexDesc[1].AlignedByteOffset = 12;
 		vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+		vertexDesc[2].SemanticName = "TEXCOORD";
+		vertexDesc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+		vertexDesc[2].AlignedByteOffset = 24;
+		vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		// Create Vertex Buffer
 		D3D11_BUFFER_DESC bd = {};
@@ -88,7 +93,6 @@ namespace dae
 		if (m_pVertexBuffer) m_pVertexBuffer->Release();
 		delete m_pEffect;
 		m_pEffect = nullptr;
-		if (m_pDiffuseVariable) m_pDiffuseVariable->Release();
 	}
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix,Texture* myTexture) const

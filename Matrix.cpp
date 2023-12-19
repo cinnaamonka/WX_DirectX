@@ -31,12 +31,12 @@ namespace dae {
 	float* Matrix::GetMatrixAsArray() const
 	{
 		return new float[]
-		{
-					data[0].x, data[1].x, data[2].x, data[3].x,
-					data[0].y, data[1].y, data[2].y, data[3].y,
-					data[0].z, data[1].z, data[2].z, data[3].z,
-					data[0].w, data[1].w, data[2].w, data[3].w,
-		};
+			{
+				    data[0].x, data[0].y, data[0].z, data[0].w,
+					data[1].x, data[1].y, data[1].z, data[1].w,
+					data[2].x, data[2].y, data[2].z, data[2].w,
+					data[3].x, data[3].y, data[3].z, data[3].w,
+			};
 	}
 	Vector3 Matrix::TransformVector(const Vector3& v) const
 	{
@@ -127,7 +127,7 @@ namespace dae {
 		const Vector3 r0 = Vector3::Cross(b, v) + t * y;
 		const Vector3 r1 = Vector3::Cross(v, a) - t * x;
 		const Vector3 r2 = Vector3::Cross(d, u) + s * w;
-		//Vector3 r3 = Vector3::Cross(u, c) - s * z;
+		//Vector3 r3 = Vector3::Cross(u, c) - s * z; 
 
 		data[0] = Vector4{ r0.x, r1.x, r2.x, 0.f };
 		data[1] = Vector4{ r0.y, r1.y, r2.y, 0.f };

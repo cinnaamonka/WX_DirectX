@@ -39,7 +39,7 @@ int main(int argc, char* args[])
 
 	//Initialize "framework"
 	const auto pTimer = new Timer();
-	Camera camera{Vector3{ 0.0f, 0.0f ,-10.0f },45.f };
+	Camera camera{Vector3{ 0.0f, 0.0f ,-10.0f },90.f };
 	
 	const auto pRenderer = new Renderer(pWindow, &camera);
 

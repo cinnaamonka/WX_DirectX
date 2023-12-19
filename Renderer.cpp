@@ -11,7 +11,7 @@ namespace dae {
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
-		m_pCamera->Initialize(45.0f,90.f, Vector3{ 0.0f, 0.0f ,-10.0f });
+		m_pCamera->Initialize(m_Width/ m_Height, 90.f, Vector3{ 0.0f, 0.0f ,-10.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
 		if (result == S_OK)
@@ -26,7 +26,7 @@ namespace dae {
 				Vertex{{ 3, -3, -2}, {}, {1, 1}} 
 			};
 			std::vector<uint32_t> indices{ 0, 1,  2, 2, 1, 3 };
-			// ReSharper disable once CppObjectMemberMightNotBeInitialized
+		
 			m_pMesh = new Mesh(m_pDevice, vertices, indices);
 
 			m_pMyTexture = new Texture();
