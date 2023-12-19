@@ -8,6 +8,8 @@ namespace dae
 	private:
 		ID3DX11Effect* m_pEffect;
 		ID3DX11EffectTechnique* m_pTechnique;
+		ID3DX11EffectMatrixVariable* m_pViewProjectionMatrix = nullptr;
+		
 
 	public:
 		Effect() = default;
@@ -18,7 +20,16 @@ namespace dae
 
 		ID3DX11Effect* GetEffect() const;
 		ID3DX11EffectTechnique* GetTechnique() const;
-		ID3DX11EffectMatrixVariable* m_pViewProjectionMatrix = nullptr;
+		
+		void SetViewProjectionMatrix(float* viewProjectionMatrix)
+		{
+			m_pViewProjectionMatrix->SetMatrix(viewProjectionMatrix);
+		}
+
+		ID3DX11EffectMatrixVariable* GetViewProjectionMatrix()
+		{
+			return m_pViewProjectionMatrix;
+		}
 		ID3DX11EffectVariable* GetVariableByName(const std::string& name) const;
 	};
 

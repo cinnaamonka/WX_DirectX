@@ -85,6 +85,11 @@ namespace dae
 		}
 		return false;
 	}
+	void Mesh::UpdateWorldmatrix()
+	{
+		Matrix worldViewProjectionMatrix = m_WorldMatrix * m_ViewMatrix * m_ProjectionMatrix;
+		m_pEffect->SetViewProjectionMatrix(reinterpret_cast<float*>(&worldViewProjectionMatrix));
+	}
 	Mesh::~Mesh()
 	{
 		// TODO: initialize destruct sequence
@@ -110,12 +115,13 @@ namespace dae
 		D3DX11_TECHNIQUE_DESC techDesc{};
 		m_pEffect->GetTechnique()->GetDesc(&techDesc);
 		
-		for (UINT p = 0; p < techDesc.Passes; ++p)
+		if (m_SampleState < techDesc.Passes)
 		{
-		
-			m_pEffect->GetTechnique()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+			m_pEffect->GetTechnique()->GetPassByIndex(m_SampleState)->Apply(0, pDeviceContext);
 			pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
 			
 		}
+		
 	}
+
 };

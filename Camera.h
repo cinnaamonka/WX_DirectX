@@ -31,7 +31,7 @@ namespace dae
 		float nearPlane = 0.1f;
 		float farPlane = 100.f;
 
-		Matrix ProjectionMatrix{};
+		Matrix projectionMatrix{};
 		Matrix invViewMatrix{};
 		Matrix viewMatrix{};
 		Matrix worldViewProectionMatrix{};
@@ -65,8 +65,8 @@ namespace dae
 		{
 			//TODO W3
 
-			ProjectionMatrix = Matrix::CreatePerspectiveFovLH(fov, aspectRatioVar, nearPlane, farPlane);
-			worldViewProectionMatrix = invViewMatrix * ProjectionMatrix;
+			projectionMatrix = Matrix::CreatePerspectiveFovLH(fov, aspectRatioVar, nearPlane, farPlane);
+			worldViewProectionMatrix = invViewMatrix * projectionMatrix;
 		}
 
 		Matrix GetViewMatrix() const 
@@ -127,7 +127,7 @@ namespace dae
 
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
 
-			const float rotationSpeed = 1.5f;
+			const float rotationSpeed = 20.f;
 
 			const bool isRightMousePressed{ mouseState == SDL_BUTTON_X1 };
 			const bool isLeftMousePressed{ mouseState == SDL_BUTTON_LEFT };
@@ -177,5 +177,7 @@ namespace dae
 			CalculateViewMatrix();
 			CalculateProjectionMatrix(); //Try to optimize this - should only be called once or when fov/aspectRatio changes
 		}
+	
 	};
+	
 }

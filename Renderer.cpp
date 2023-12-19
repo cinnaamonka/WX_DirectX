@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "Mesh.h"
 #include "Camera.h"
+#include "Utils.h"
 
 namespace dae {
 
@@ -11,14 +12,15 @@ namespace dae {
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
-		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), 90.f, Vector3{ 0.0f, 0.0f ,-10.0f });
+		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), 45.f, Vector3{ 0.0f, 0.0f ,-50.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
 		if (result == S_OK)
 		{
 			m_IsInitialized = true;
 			std::cout << "DirectX is initialized and ready!\n";
-			std::vector<Vertex> vertices = 
+			// test
+			/*std::vector<Vertex> vertices = 
 			{
 					{{-3,  3, -2}, {}, {0, 0}},
 					{{ 3,  3, -2}, {}, {1, 0}},
@@ -31,6 +33,22 @@ namespace dae {
 
 			m_pMyTexture = new Texture();
 			m_pMyTexture->LoadFromFile("Resources/uv_grid_2.png", m_pDevice);
+			m_pMesh->SetDiffuseMap(m_pMyTexture);*/
+
+			std::vector<Vertex>   vehicle_vertices{};
+			std::vector<uint32_t> vehicle_indices{};
+
+			
+
+			if (!Utils::ParseOBJ("Resources/vehicle.obj", vehicle_vertices, vehicle_indices))
+			{
+				std::cout << "Object initialization failed!\n";
+			}
+
+			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices);
+
+			m_pMyTexture = new Texture(); 
+			m_pMyTexture->LoadFromFile("Resources/vehicle_diffuse.png", m_pDevice);
 			m_pMesh->SetDiffuseMap(m_pMyTexture);
 		}
 		else
@@ -41,11 +59,7 @@ namespace dae {
 
 	Renderer::~Renderer()
 	{
-		if (m_pMesh)
-		{
-			delete m_pMesh;
-			m_pMesh = nullptr;
-		}
+
 		if (m_pRenderTargetView) m_pRenderTargetView->Release();
 		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
 		if (m_pDepthStencilView) m_pDepthStencilView->Release();
@@ -64,11 +78,24 @@ namespace dae {
 			delete m_pMyTexture;
 			m_pMyTexture = nullptr;
 		}
+
+		if (m_pMesh)
+		{
+			delete m_pMesh;
+			m_pMesh = nullptr;
+		}
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_pCamera->Update(pTimer);
+
+		if (m_CanBeRotated)
+		{
+			const float angle = PI_DIV_2 * pTimer->GetTotal();
+
+			m_pMesh->RotateY(angle);
+		}
 	}
 
 
@@ -83,10 +110,11 @@ namespace dae {
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
-		const auto matrix = m_pCamera->ViewProjectionMatrix();
+		 auto matrix = m_pMesh->GetWorldMatrix();
+		matrix *= m_pCamera->ViewProjectionMatrix();
 		m_pMesh->Render(m_pDeviceContext, &matrix, m_pMyTexture);
 
-		// 3. PRESENT BACKBUFFER (SWAP)
+		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}
 
@@ -183,5 +211,11 @@ namespace dae {
 		m_pDeviceContext->RSSetViewports(1, &viewport);
 
 		return S_OK;
+	}
+
+	void Renderer::CycleSamplerState()
+	{
+		m_SampleState = static_cast<SamplerState>((static_cast<int>(m_SampleState) + 1) % 3);
+		m_pMesh->SetSampleState(static_cast<UINT>(m_SampleState));
 	}
 }

@@ -23,6 +23,12 @@ namespace dae
 
 		void Update(const Timer* pTimer);
 		void Render() const;
+		void CycleSamplerState();
+		void RotateModel()
+		{
+			m_CanBeRotated = !m_CanBeRotated;
+
+		};
 
 	private:
 		SDL_Window* m_pWindow{};
@@ -30,7 +36,17 @@ namespace dae
 		int m_Width{};
 		int m_Height{};
 
-		bool m_IsInitialized{ false };
+		enum class SamplerState
+		{
+			Point,
+			Linear,
+			Anisotropic
+		};
+
+		SamplerState m_SampleState = SamplerState::Point;
+
+		bool m_IsInitialized = false;
+		bool m_CanBeRotated = false;
 
 		//DIRECTX
 		HRESULT InitializeDirectX();

@@ -7,6 +7,18 @@ SamplerState samPoint
     AddressU = Wrap;
     AddressV = Wrap;
 };
+SamplerState samLinear
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+SamplerState samAnisotropic
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
 
 
 struct VS_INPUT
@@ -33,9 +45,19 @@ VS_OUTPUT VS(VS_INPUT input)
     return output;
 }
 
-float4 PS(VS_OUTPUT input) : SV_TARGET
+float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
     return gDiffuseMap.Sample(samPoint, input.uv);
+}
+
+float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
+{
+    return gDiffuseMap.Sample(samLinear, input.uv);
+}
+
+float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
+{
+    return gDiffuseMap.Sample(samAnisotropic, input.uv);
 }
 
 technique11 DefaultTechnique
@@ -44,7 +66,20 @@ technique11 DefaultTechnique
     {
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS()));
+        SetPixelShader(CompileShader(ps_5_0, PS_Point()));
+    }
+    
+    pass P1
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_Linear()));
+    }
+    
+    pass P2
+    {
+        SetVertexShader(CompileShader(vs_5_0, VS()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));
     }
 }
-
