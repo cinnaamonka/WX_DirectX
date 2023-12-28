@@ -25,8 +25,9 @@ namespace dae
 		int m_NumIndices;
 		ID3D11Buffer* m_pIndexBuffer;
 		ID3DX11EffectShaderResourceVariable* m_pDiffuseVariable = nullptr;
-
-		
+		ID3DX11EffectShaderResourceVariable* m_pSpecularVariable = nullptr;
+		ID3DX11EffectShaderResourceVariable* m_pGlossinessVariable = nullptr;
+		ID3DX11EffectShaderResourceVariable* m_pNormalVariable = nullptr;
 
 	public:
 		Mesh() = default;
@@ -34,7 +35,10 @@ namespace dae
 		~Mesh();
 		void UpdateWorldmatrix();
 		bool SetDiffuseMap(Texture* pDiffuseTexture);
-		void Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix, Texture* myTexture) const;
+		bool SetSpecularMap(Texture* pDiffuseTexture);
+		bool SetGlossinessMap(Texture* pDiffuseTexture);
+		bool SetNormalMap(Texture* pDiffuseTexture);
+		void Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix, const Matrix* worldMatrix) const;
 
 		void SetSampleState(UINT stateIndex) 
 		{ 
@@ -47,7 +51,6 @@ namespace dae
 			m_ProjectionMatrix = projectionMatrix;
 			Matrix worldViewProjectionMatrix = m_WorldMatrix * m_ViewMatrix * m_ProjectionMatrix;
 			m_pEffect->SetViewProjectionMatrix(reinterpret_cast<float*>(&worldViewProjectionMatrix)); 
-			//m_pEffect->UpdateViewProjectionMatrix(&worldViewProjectionMatrix);
 		}
 		void RotateY(float yaw)
 		{

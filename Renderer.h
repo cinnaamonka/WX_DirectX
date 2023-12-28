@@ -61,6 +61,9 @@ namespace dae
 
 		Camera* m_pCamera;
 
-		Texture* m_pMyTexture;
+		Texture* m_pDiffuseTexture;
+		Texture* m_pSpecularTexture;
+		Texture* m_pGlossinessTexture;
+		Texture* m_pNormalTexture;
 	};
 }

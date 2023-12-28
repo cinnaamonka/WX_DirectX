@@ -47,9 +47,24 @@ namespace dae {
 
 			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices);
 
-			m_pMyTexture = new Texture(); 
-			m_pMyTexture->LoadFromFile("Resources/vehicle_diffuse.png", m_pDevice);
-			m_pMesh->SetDiffuseMap(m_pMyTexture);
+			m_pDiffuseTexture = new Texture(); 
+			m_pDiffuseTexture->LoadFromFile("Resources/vehicle_diffuse.png", m_pDevice);
+			m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
+
+			// Load and set specular map
+			m_pSpecularTexture = new Texture();
+			m_pSpecularTexture->LoadFromFile("Resources/vehicle_specular.png", m_pDevice);
+			m_pMesh->SetSpecularMap(m_pSpecularTexture);
+
+			// Load and set glossiness map
+			m_pGlossinessTexture = new Texture();
+			m_pGlossinessTexture->LoadFromFile("Resources/vehicle_gloss.png", m_pDevice);
+			m_pMesh->SetGlossinessMap(m_pGlossinessTexture);
+
+			// Load and set normal map
+			m_pNormalTexture = new Texture();
+			m_pNormalTexture->LoadFromFile("Resources/vehicle_normal.png", m_pDevice);
+			m_pMesh->SetNormalMap(m_pNormalTexture);
 		}
 		else
 		{
@@ -73,10 +88,10 @@ namespace dae {
 		}
 		if (m_pDevice) m_pDevice->Release();
 
-		if (m_pMyTexture)
+		if (m_pDiffuseTexture)
 		{
-			delete m_pMyTexture;
-			m_pMyTexture = nullptr;
+			delete m_pDiffuseTexture;
+			m_pDiffuseTexture = nullptr;
 		}
 
 		if (m_pMesh)
@@ -110,9 +125,9 @@ namespace dae {
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
-		 auto matrix = m_pMesh->GetWorldMatrix();
-		matrix *= m_pCamera->ViewProjectionMatrix();
-		m_pMesh->Render(m_pDeviceContext, &matrix, m_pMyTexture);
+		 auto worldMatrix = m_pMesh->GetWorldMatrix();
+		auto viewProjectionMatrix = worldMatrix * m_pCamera->ViewProjectionMatrix();
+		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 
 		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);

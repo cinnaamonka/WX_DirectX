@@ -15,12 +15,15 @@ namespace dae
 			std::wcout << "File does not exist" << std::endl;
 		}
 			
-
 		m_pEffect = LoadEffect(pDevice, assetFile);
+
 		m_pTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
 
-		if (not m_pTechnique->IsValid())
+		if (!m_pTechnique->IsValid())
+		{
 			std::wcout << L"Technique is not valid" << std::endl;
+
+		}
 
 		m_pViewProjectionMatrix = m_pEffect->GetVariableByName("worldViewProjection")->AsMatrix();
 
@@ -29,12 +32,31 @@ namespace dae
 			std::wcout << L"ViewProjectionMatrix is not valid" << std::endl;
 		}
 		
+		m_pWorldMatrix = m_pEffect->GetVariableByName("worldMatrix")->AsMatrix();
+
+		if (!m_pWorldMatrix->IsValid())
+		{
+			std::wcout << L"World matrix is not valid" << std::endl;
+		}
 	}
 
 	Effect::~Effect()
 	{
 		m_pEffect->Release();
 		m_pEffect = nullptr;
+
+		if (m_pTechnique)
+		{
+			m_pTechnique->Release();
+		}
+		if (m_pViewProjectionMatrix)
+		{
+			m_pViewProjectionMatrix->Release();
+		}
+		if (m_pWorldMatrix)
+		{
+			m_pWorldMatrix->Release();
+		}
 	}
 	ID3DX11EffectVariable* Effect::GetVariableByName(const std::string& name) const
 	{
@@ -56,6 +78,23 @@ namespace dae
 				const float* data = viewProjectionMatrix->GetMatrixAsArray();
 
 				m_pViewProjectionMatrix->SetMatrix(data);
+
+				delete data;
+			}
+		}
+	}
+	void Effect::UpdateWorldMatrix(const Matrix* worldMatrix)
+	{
+		if (m_pEffect)
+		{
+
+			if (m_pWorldMatrix)
+			{
+				Matrix transposedMatrix = Matrix::Transpose(*worldMatrix);
+
+				const float* data = worldMatrix->GetMatrixAsArray();
+
+				m_pWorldMatrix->SetMatrix(data);
 
 				delete data;
 			}

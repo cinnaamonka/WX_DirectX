@@ -16,8 +16,29 @@ namespace dae
 			std::wcout << L"m_pDiffuseVariable is not valid" << std::endl;
 		}
 
+		m_pSpecularVariable = m_pEffect->GetVariableByName("gSpecularMap")->AsShaderResource(); 
+
+		if (!m_pSpecularVariable->IsValid())
+		{
+			std::wcout << L"m_pSpecularVariable is not valid" << std::endl;
+		}
+
+		m_pGlossinessVariable = m_pEffect->GetVariableByName("gGlossinessMap")->AsShaderResource(); 
+
+		if (!m_pGlossinessVariable->IsValid())
+		{
+			std::wcout << L"m_pGlossinessVariable is not valid" << std::endl;
+		}
+
+		m_pNormalVariable = m_pEffect->GetVariableByName("gNormalMap")->AsShaderResource(); 
+
+		if (!m_pNormalVariable->IsValid())
+		{
+			std::wcout << L"m_pNormalVariable is not valid" << std::endl;
+		}
+
 		// Create Vertex Layout
-		static constexpr uint32_t numElements{ 3 };
+		static constexpr uint32_t numElements{ 5 }; // Update to include normal and tangent
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
 
 		vertexDesc[0].SemanticName = "POSITION";
@@ -34,6 +55,16 @@ namespace dae
 		vertexDesc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
 		vertexDesc[2].AlignedByteOffset = 24;
 		vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+		vertexDesc[3].SemanticName = "NORMAL";
+		vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		vertexDesc[3].AlignedByteOffset = 36; // Adjust the offset based on your structure
+		vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+
+		vertexDesc[4].SemanticName = "TANGENT";
+		vertexDesc[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		vertexDesc[4].AlignedByteOffset = 48; // Adjust the offset based on your structure
+		vertexDesc[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		// Create Vertex Buffer
 		D3D11_BUFFER_DESC bd = {};
@@ -85,6 +116,35 @@ namespace dae
 		}
 		return false;
 	}
+	bool Mesh::SetSpecularMap(Texture* pSpecularTexture)
+	{
+		if (pSpecularTexture && m_pSpecularVariable->IsValid())
+		{
+			m_pSpecularVariable->SetResource(pSpecularTexture->GetShaderResourceView());
+			return true;
+		}
+		return false;
+	}
+
+	bool Mesh::SetGlossinessMap(Texture* pGlossinessTexture)
+	{
+		if (pGlossinessTexture && m_pGlossinessVariable->IsValid())
+		{
+			m_pGlossinessVariable->SetResource(pGlossinessTexture->GetShaderResourceView());
+			return true;
+		}
+		return false;
+	}
+
+	bool Mesh::SetNormalMap(Texture* pNormalTexture)
+	{
+		if (pNormalTexture && m_pNormalVariable->IsValid())
+		{
+			m_pNormalVariable->SetResource(pNormalTexture->GetShaderResourceView());
+			return true;
+		}
+		return false;
+	}
 	void Mesh::UpdateWorldmatrix()
 	{
 		Matrix worldViewProjectionMatrix = m_WorldMatrix * m_ViewMatrix * m_ProjectionMatrix;
@@ -92,17 +152,63 @@ namespace dae
 	}
 	Mesh::~Mesh()
 	{
-		// TODO: initialize destruct sequence
-		if (m_pIndexBuffer) m_pIndexBuffer->Release();
-		if (m_pInputLayout) m_pInputLayout->Release();
-		if (m_pVertexBuffer) m_pVertexBuffer->Release();
-		delete m_pEffect;
-		m_pEffect = nullptr;
+		// Release Effect resources
+		if (m_pEffect)
+		{
+			delete m_pEffect;
+			m_pEffect = nullptr;
+		}
+
+		// Release Shader Resource Variables
+		if (m_pDiffuseVariable)
+		{
+			m_pDiffuseVariable->Release();
+			m_pDiffuseVariable = nullptr;
+		}
+
+		if (m_pSpecularVariable)
+		{
+			m_pSpecularVariable->Release();
+			m_pSpecularVariable = nullptr;
+		}
+
+		if (m_pGlossinessVariable)
+		{
+			m_pGlossinessVariable->Release();
+			m_pGlossinessVariable = nullptr;
+		}
+
+		if (m_pNormalVariable)
+		{
+			m_pNormalVariable->Release();
+			m_pNormalVariable = nullptr;
+		}
+
+		// Release other resources
+		if (m_pInputLayout)
+		{
+			m_pInputLayout->Release();
+			m_pInputLayout = nullptr;
+		}
+
+		if (m_pVertexBuffer)
+		{
+			m_pVertexBuffer->Release();
+			m_pVertexBuffer = nullptr;
+		}
+
+		if (m_pIndexBuffer)
+		{
+			m_pIndexBuffer->Release();
+			m_pIndexBuffer = nullptr;
+		}
 	}
 
-	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix,Texture* myTexture) const
+
+	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix, const Matrix* worldMatrix) const
 	{
 		m_pEffect->UpdateViewProjectionMatrix(viewProjectionMatrix);
+		m_pEffect->UpdateWorldMatrix(worldMatrix);
 
 		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pDeviceContext->IASetInputLayout(m_pInputLayout);

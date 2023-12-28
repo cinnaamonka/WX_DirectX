@@ -6,9 +6,10 @@ namespace dae
 	class Effect {
 
 	private:
-		ID3DX11Effect* m_pEffect;
-		ID3DX11EffectTechnique* m_pTechnique;
+		ID3DX11Effect* m_pEffect = nullptr;
+		ID3DX11EffectTechnique* m_pTechnique = nullptr;
 		ID3DX11EffectMatrixVariable* m_pViewProjectionMatrix = nullptr;
+		ID3DX11EffectMatrixVariable* m_pWorldMatrix = nullptr;
 		
 
 	public:
@@ -16,7 +17,7 @@ namespace dae
 		Effect(ID3D11Device* pDevice, const std::wstring& assetFile);
 		~Effect();
 		void UpdateViewProjectionMatrix(const Matrix* viewProjectionMatrix);
-
+		void UpdateWorldMatrix(const Matrix* worldMatrix);
 
 		ID3DX11Effect* GetEffect() const;
 		ID3DX11EffectTechnique* GetTechnique() const;
