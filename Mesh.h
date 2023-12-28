@@ -29,11 +29,14 @@ namespace dae
 		ID3DX11EffectShaderResourceVariable* m_pGlossinessVariable = nullptr;
 		ID3DX11EffectShaderResourceVariable* m_pNormalVariable = nullptr;
 
+		ID3DX11EffectVectorVariable* m_CameraOrigin = nullptr;
+
+
 	public:
 		Mesh() = default;
 		Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
 		~Mesh();
-		void UpdateWorldmatrix();
+	
 		bool SetDiffuseMap(Texture* pDiffuseTexture);
 		bool SetSpecularMap(Texture* pDiffuseTexture);
 		bool SetGlossinessMap(Texture* pDiffuseTexture);
@@ -45,13 +48,6 @@ namespace dae
 			m_SampleState = stateIndex; 
 		};
 
-		void SetMatrix(const Matrix& viewMatrix, const Matrix& projectionMatrix) 
-		{
-			m_ViewMatrix = viewMatrix;
-			m_ProjectionMatrix = projectionMatrix;
-			Matrix worldViewProjectionMatrix = m_WorldMatrix * m_ViewMatrix * m_ProjectionMatrix;
-			m_pEffect->SetViewProjectionMatrix(reinterpret_cast<float*>(&worldViewProjectionMatrix)); 
-		}
 		void RotateY(float yaw)
 		{
 			m_WorldMatrix = Matrix::CreateRotationY(yaw);
@@ -66,12 +62,19 @@ namespace dae
 			return m_WorldMatrix;
 		}
 
+		void SetCameraOrigin(const dae::Vector3& origin) const
+		{
+			m_CameraOrigin->SetFloatVector(reinterpret_cast<const float*>(&origin));
+		}
+
 	private:
 		UINT m_SampleState;
 		Matrix m_WorldMatrix{};
+
 		Matrix m_ViewMatrix{};
 		Matrix m_ProjectionMatrix{};
 
+		
 
 	};
 }

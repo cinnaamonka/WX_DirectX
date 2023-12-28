@@ -77,6 +77,7 @@ namespace dae
 		{
 			return worldViewProectionMatrix;
 		}
+		const Vector3& GetOrigin() const { return origin; }
 		Matrix CalculateCameraToWorld()
 		{
 			right = Vector3::Cross(Vector3::UnitY, forward).Normalized();

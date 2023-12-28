@@ -58,12 +58,13 @@ namespace dae
 		ID3D11Texture2D* m_pRenderTargetBuffer;
 		ID3D11RenderTargetView* m_pRenderTargetView;
 		Mesh* m_pMesh;
-
+		Mesh* m_pFireFXMesh = nullptr;
 		Camera* m_pCamera;
 
 		Texture* m_pDiffuseTexture;
 		Texture* m_pSpecularTexture;
 		Texture* m_pGlossinessTexture;
 		Texture* m_pNormalTexture;
+		Texture* m_pFireTexture;
 	};
 }

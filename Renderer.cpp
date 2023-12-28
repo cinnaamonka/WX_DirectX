@@ -37,14 +37,18 @@ namespace dae {
 
 			std::vector<Vertex>   vehicle_vertices{};
 			std::vector<uint32_t> vehicle_indices{};
-
-			
+			std::vector<Vertex>   fireFx_vertices{};
+			std::vector<uint32_t> fireFx_indices{};
 
 			if (!Utils::ParseOBJ("Resources/vehicle.obj", vehicle_vertices, vehicle_indices))
 			{
 				std::cout << "Object initialization failed!\n";
 			}
 
+			if (!Utils::ParseOBJ("Resources/fireFX.obj", fireFx_vertices, fireFx_indices))
+			{
+				std::cout << "Object initialization failed!\n";
+			}
 			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices);
 
 			m_pDiffuseTexture = new Texture(); 
@@ -65,6 +69,11 @@ namespace dae {
 			m_pNormalTexture = new Texture();
 			m_pNormalTexture->LoadFromFile("Resources/vehicle_normal.png", m_pDevice);
 			m_pMesh->SetNormalMap(m_pNormalTexture);
+
+			m_pFireTexture = new Texture();
+			m_pFireTexture->LoadFromFile("Resources/fireFX_diffuse.png", m_pDevice);
+			m_pFireFXMesh = new Mesh(m_pDevice, fireFx_vertices, fireFx_indices);
+			m_pFireFXMesh->SetDiffuseMap(m_pFireTexture);
 		}
 		else
 		{
@@ -88,16 +97,40 @@ namespace dae {
 		}
 		if (m_pDevice) m_pDevice->Release();
 
+		if (m_pNormalTexture)
+		{
+			delete m_pNormalTexture;
+			m_pNormalTexture = nullptr;
+		}
 		if (m_pDiffuseTexture)
 		{
 			delete m_pDiffuseTexture;
 			m_pDiffuseTexture = nullptr;
 		}
-
+		if (m_pSpecularTexture)
+		{
+			delete m_pSpecularTexture;
+			m_pSpecularTexture = nullptr;
+		}
+		if (m_pGlossinessTexture)
+		{
+			delete m_pGlossinessTexture;
+			m_pGlossinessTexture = nullptr;
+		}
+		if (m_pFireTexture)
+		{
+			delete m_pFireTexture;
+			m_pFireTexture = nullptr;
+		}
 		if (m_pMesh)
 		{
 			delete m_pMesh;
 			m_pMesh = nullptr;
+		}
+		if (m_pFireFXMesh)
+		{
+			delete m_pFireFXMesh;
+			m_pFireFXMesh = nullptr;
 		}
 	}
 
@@ -110,6 +143,7 @@ namespace dae {
 			const float angle = PI_DIV_2 * pTimer->GetTotal();
 
 			m_pMesh->RotateY(angle);
+			m_pFireFXMesh->RotateY(angle);
 		}
 	}
 
@@ -124,11 +158,14 @@ namespace dae {
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, color);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
+		m_pMesh->SetCameraOrigin(m_pCamera->GetOrigin());
+
+
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
-		 auto worldMatrix = m_pMesh->GetWorldMatrix();
+		auto worldMatrix = m_pMesh->GetWorldMatrix();
 		auto viewProjectionMatrix = worldMatrix * m_pCamera->ViewProjectionMatrix();
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
-
+		m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}

@@ -37,6 +37,13 @@ namespace dae
 			std::wcout << L"m_pNormalVariable is not valid" << std::endl;
 		}
 
+		m_CameraOrigin = m_pEffect->GetVariableByName("gCameraPos")->AsVector();
+
+		if (!m_CameraOrigin->IsValid())
+		{
+			std::wcout << L"m_CameraOrigin is not valid" << std::endl;
+		}
+
 		// Create Vertex Layout
 		static constexpr uint32_t numElements{ 5 }; // Update to include normal and tangent
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
@@ -145,19 +152,10 @@ namespace dae
 		}
 		return false;
 	}
-	void Mesh::UpdateWorldmatrix()
-	{
-		Matrix worldViewProjectionMatrix = m_WorldMatrix * m_ViewMatrix * m_ProjectionMatrix;
-		m_pEffect->SetViewProjectionMatrix(reinterpret_cast<float*>(&worldViewProjectionMatrix));
-	}
+
 	Mesh::~Mesh()
 	{
-		// Release Effect resources
-		if (m_pEffect)
-		{
-			delete m_pEffect;
-			m_pEffect = nullptr;
-		}
+		
 
 		// Release Shader Resource Variables
 		if (m_pDiffuseVariable)
@@ -201,6 +199,13 @@ namespace dae
 		{
 			m_pIndexBuffer->Release();
 			m_pIndexBuffer = nullptr;
+		}
+
+		// Release Effect resources
+		if (m_pEffect)
+		{
+			delete m_pEffect;
+			m_pEffect = nullptr;
 		}
 	}
 

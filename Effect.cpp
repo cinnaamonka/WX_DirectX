@@ -38,17 +38,17 @@ namespace dae
 		{
 			std::wcout << L"World matrix is not valid" << std::endl;
 		}
+
+		
 	}
 
 	Effect::~Effect()
 	{
-		m_pEffect->Release();
-		m_pEffect = nullptr;
-
-		if (m_pTechnique)
+		if (m_pTechnique != nullptr)
 		{
 			m_pTechnique->Release();
 		}
+
 		if (m_pViewProjectionMatrix)
 		{
 			m_pViewProjectionMatrix->Release();
@@ -57,6 +57,12 @@ namespace dae
 		{
 			m_pWorldMatrix->Release();
 		}
+
+		m_pEffect->Release();
+		m_pEffect = nullptr;
+
+		
+		
 	}
 	ID3DX11EffectVariable* Effect::GetVariableByName(const std::string& name) const
 	{
@@ -73,13 +79,12 @@ namespace dae
 
 			if (m_pViewProjectionMatrix)
 			{
-				Matrix transposedMatrix = Matrix::Transpose(*viewProjectionMatrix);
 
 				const float* data = viewProjectionMatrix->GetMatrixAsArray();
 
 				m_pViewProjectionMatrix->SetMatrix(data);
 
-				delete data;
+				delete[] data;
 			}
 		}
 	}
@@ -87,16 +92,13 @@ namespace dae
 	{
 		if (m_pEffect)
 		{
-
 			if (m_pWorldMatrix)
 			{
-				Matrix transposedMatrix = Matrix::Transpose(*worldMatrix);
-
-				const float* data = worldMatrix->GetMatrixAsArray();
+				const float* data = worldMatrix->GetMatrixAsArray(); 
 
 				m_pWorldMatrix->SetMatrix(data);
 
-				delete data;
+				delete[] data;
 			}
 		}
 	}

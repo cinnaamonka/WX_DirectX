@@ -37,22 +37,20 @@ SamplerState samAnisotropic
 struct VS_INPUT
 {
     float3 Position : POSITION;
-    float3 Color : COLOR;
     float2 uv : TEXCOORD0;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
-};
+    
+ };
 
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
     float4 WorldPosition : TEXCOORD1;
-    float3 Color : COLOR;
     float2 uv : TEXCOORD0;
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
     float3 ViewDirection : TEXCOORD2;
-    float3 LightDirection : TEXCOORD3;
 };
 
 
@@ -61,49 +59,61 @@ VS_OUTPUT VS(VS_INPUT input)
     VS_OUTPUT output = (VS_OUTPUT) 0;
     output.Position = mul(float4(input.Position, 1.f), worldViewProjection);
     
-    // Transform position to world space
     output.WorldPosition = mul(float4(input.Position, 1.f), worldMatrix);
     
-    // Calculate view direction in world space
     output.ViewDirection = normalize(gCameraPos - output.WorldPosition.xyz);
     
-    output.Color = input.Color;
     output.uv = input.uv;
-    output.normal = mul(normalize(input.normal), (float3x3) worldMatrix);
+    output.normal = mul(input.normal, (float3x3) worldMatrix);
     output.tangent = mul(normalize(input.tangent), (float3x3) worldMatrix);
     return output;
 }
+VS_OUTPUT VS_FireFX(VS_INPUT input)
+{
+    VS_OUTPUT output = (VS_OUTPUT)0;
+    
+    output.Position = mul(float4(input.Position, 1.0f), worldViewProjection);
+    
+    output.uv = input.uv;
 
+    return output;
+}
 float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
-    float4 sampleDiffuseColor = float4(1, 1, 1, 1);
-    float4 ambientColor = float4(0.05f, 0.05f, 0.05f, 1.0f);
+    float4 ambientOcclusion = float4(0.05f, 0.05f, 0.05f, 1.0f);
     float sampledSpecular = 0.5f;
     float sampledPhongExponent = 20.0f;
-    float diffuseStrengthKd = 3.0f;
+    float diffuseStrengthKd = 7.0f;
     
-    sampledPhongExponent *= gGlossinessMap.Sample(samPoint, input.uv).r;
-    sampledSpecular *= gSpecularMap.Sample(samPoint, input.uv).r;
-    sampleDiffuseColor *= gDiffuseMap.Sample(samPoint, input.uv);
-   
-    float3 sampledNormalColor = gNormalMap.Sample(samPoint, input.uv).xyz;
-    float3x3 tbnMatrix = float3x3(input.tangent, cross(input.normal, input.tangent), input.normal);
-    float3 sampledNormal = mul(sampledNormalColor * 2.0f - 1.0f, tbnMatrix);
-   
-    float4 lambertDiffuse = sampleDiffuseColor * diffuseStrengthKd / gPI;
-    
-    float observedArea = max(0.0f, dot(sampledNormal, -gLightDirection));
-    
-    float3 reflection = reflect(gLightDirection, sampledNormal);
-    float cosAlpha = max(0.0f, dot(reflection, input.ViewDirection));
-    float specularIntensity = sampledSpecular * pow(cosAlpha, sampledPhongExponent);
-    float4 specularColor = specularIntensity * float4(1, 1, 1, 1);
-    
-    
-    return saturate((specularColor + lambertDiffuse) * observedArea + ambientColor);
-}
+  
+	//normal mapping
+    float3 binormal = cross(input.normal, input.tangent);
+    float3x3 tangentSpaceAxis = float3x3(input.tangent, binormal, input.normal);
+    float3 sampledNormalColor = gNormalMap.Sample(samPoint, input.uv).rgb; 
 
+    sampledNormalColor = 2 * sampledNormalColor - 1;
 
+    float3 resultNormal = mul(sampledNormalColor.rgb, tangentSpaceAxis);
+
+ 	// lambert diffuse
+
+    float4 sampleDiffuse = gDiffuseMap.Sample(samPoint, input.uv);
+    float4 lambertDiffuse = sampleDiffuse * diffuseStrengthKd / gPI;
+
+    float cosAngle = dot(resultNormal, gLightDirection);
+
+	// phong 
+    float3 reflection = reflect(-gLightDirection, resultNormal);
+    float cosAlpha = max(dot(reflection, input.ViewDirection), 0.0f);
+    sampledSpecular = gSpecularMap.Sample(samPoint, input.uv);
+    sampledPhongExponent = gGlossinessMap.Sample(samPoint, input.uv);
+
+    float4 specularColor = sampledSpecular * pow(cosAlpha, sampledPhongExponent * gShininess);
+   
+   
+
+    return (lambertDiffuse + specularColor + ambientOcclusion) * cosAngle; 
+};
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
 {
     float4 baseColor = float4(1, 1, 1, 1);
@@ -125,14 +135,15 @@ float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
     float3 worldNormal = mul(sampledNormalColor * 2.0f - 1.0f, tangentToWorldMatrix);
 
     // Lambertian diffuse reflection
-    float4 lambertDiffuse = baseColor * (diffuseStrength / 3.16f);
+    float4 lambertDiffuse = baseColor * (diffuseStrength / gPI);
 
     // Cosine law for observed area
     float observedArea = saturate(dot(worldNormal, gLightDirection));
 
     // Specular reflection calculation
     float3 reflectedRay = reflect(-gLightDirection, worldNormal);
-    float cosAlpha = saturate(dot(reflectedRay, normalize(input.WorldPosition.xyz - gCameraPos)));
+    float3 viewDirection = normalize(gCameraPos - input.WorldPosition.xyz);
+    float cosAlpha = saturate(dot(reflectedRay, viewDirection));
     float4 specularColor = specularIntensity * pow(cosAlpha, phongExponent) * float4(1, 1, 1, 1) * specularMapSample;
 
     // Final color calculation
@@ -163,7 +174,7 @@ float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
     float3 worldNormal = mul(sampledNormalColor * 2.0f - 1.0f, tangentToWorldMatrix);
 
     // Lambertian diffuse reflection
-    float4 lambertDiffuse = baseColor * (diffuseStrength / 3.16f);
+    float4 lambertDiffuse = baseColor * (diffuseStrength / gPI);
 
     // Cosine law for observed area
     float observedArea = saturate(dot(worldNormal, gLightDirection));
@@ -178,7 +189,11 @@ float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
 
     return finalColor;
 }
-
+float4 PS_FireFX(VS_OUTPUT input) : SV_TARGET
+{
+    float4 color = gDiffuseMap.Sample(samPoint, input.uv);
+    return color;
+}
 
 technique11 DefaultTechnique
 {

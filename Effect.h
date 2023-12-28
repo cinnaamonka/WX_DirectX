@@ -10,6 +10,7 @@ namespace dae
 		ID3DX11EffectTechnique* m_pTechnique = nullptr;
 		ID3DX11EffectMatrixVariable* m_pViewProjectionMatrix = nullptr;
 		ID3DX11EffectMatrixVariable* m_pWorldMatrix = nullptr;
+
 		
 
 	public:
@@ -32,6 +33,9 @@ namespace dae
 			return m_pViewProjectionMatrix;
 		}
 		ID3DX11EffectVariable* GetVariableByName(const std::string& name) const;
+
+		
+
 	};
 
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile);
