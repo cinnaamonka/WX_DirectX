@@ -137,13 +137,15 @@ namespace dae {
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_pCamera->Update(pTimer);
+		m_pMesh->SetCameraOrigin(m_pCamera->GetOrigin());
 
 		if (m_CanBeRotated)
 		{
 			const float angle = PI_DIV_2 * pTimer->GetTotal();
 
 			m_pMesh->RotateY(angle);
-			m_pFireFXMesh->RotateY(angle);
+			//m_pFireFXMesh->RotateY(angle);
+
 		}
 	}
 
@@ -158,14 +160,13 @@ namespace dae {
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, color);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
-		m_pMesh->SetCameraOrigin(m_pCamera->GetOrigin());
-
-
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
-		auto worldMatrix = m_pMesh->GetWorldMatrix();
-		auto viewProjectionMatrix = worldMatrix * m_pCamera->ViewProjectionMatrix();
+		const auto worldMatrix = m_pMesh->GetWorldMatrix();
+		
+		auto viewProjectionMatrix = worldMatrix * m_pCamera->worldViewProectionMatrix;
+		
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
-		m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
+		//m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}

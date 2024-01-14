@@ -12,7 +12,14 @@ namespace dae {
 		Matrix({ xAxis, 0 }, { yAxis, 0 }, { zAxis, 0 }, { t, 1 })
 	{
 	}
-
+	Matrix::Matrix(const DirectX::XMMATRIX& m) : Matrix(
+		{ m.r[0].m128_f32[0],m.r[0].m128_f32[1],m.r[0].m128_f32[2],m.r[0].m128_f32[3] },
+		{ m.r[1].m128_f32[0],m.r[1].m128_f32[1],m.r[1].m128_f32[2],m.r[1].m128_f32[3] },
+		{ m.r[2].m128_f32[0],m.r[2].m128_f32[1],m.r[2].m128_f32[2],m.r[2].m128_f32[3] },
+		{ m.r[3].m128_f32[0],m.r[3].m128_f32[1],m.r[3].m128_f32[2],m.r[3].m128_f32[3] }
+	)
+	{
+	}
 	Matrix::Matrix(const Vector4& xAxis, const Vector4& yAxis, const Vector4& zAxis, const Vector4& t)
 	{
 		data[0] = xAxis;
@@ -174,13 +181,9 @@ namespace dae {
 
 	Matrix Matrix::CreatePerspectiveFovLH(float fov, float aspect, float zn, float zf)
 	{
-		return Matrix
-		{
-			Vector4(1 / (aspect * fov),0,0,0),
-			Vector4(0,1 / fov,0,0),
-			Vector4(0, 0,zf / (zf - zn),1),
-			Vector4(0, 0, -(zf * zn) / (zf - zn),0)
-		};
+		const DirectX::XMMATRIX persMatrixDX = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov), aspect, zn, zf);
+
+		return Matrix{ persMatrixDX };
 	}
 
 	Vector3 Matrix::GetAxisX() const

@@ -45,9 +45,10 @@ namespace dae
 		}
 
 		// Create Vertex Layout
+		// Create Vertex Layout
 		static constexpr uint32_t numElements{ 5 }; // Update to include normal and tangent
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
-
+		       
 		vertexDesc[0].SemanticName = "POSITION";
 		vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		vertexDesc[0].AlignedByteOffset = 0;

@@ -17,7 +17,7 @@ namespace dae
 		}
 
 		Vector3 origin{};
-		float fovAngle{ 90.f };
+		float fovAngle{ 45.f };
 		float fov{ tanf((fovAngle * TO_RADIANS) / 2.f) };
 
 		Vector3 forward{ Vector3::UnitZ };
@@ -58,15 +58,15 @@ namespace dae
 			invViewMatrix = viewMatrix.Inverse();
 
 			//ViewMatrix => Matrix::CreateLookAtLH(...) [not implemented yet]
-			viewMatrix = Matrix::CreateLookAtLH(origin, forward, up);
+			//viewMatrix = Matrix::CreateLookAtLH(origin, forward, up);
 		}
 
 		void CalculateProjectionMatrix()
 		{
 			//TODO W3
 
-			projectionMatrix = Matrix::CreatePerspectiveFovLH(fov, aspectRatioVar, nearPlane, farPlane);
-			worldViewProectionMatrix = invViewMatrix * projectionMatrix;
+			projectionMatrix = Matrix::CreatePerspectiveFovLH(fovAngle, aspectRatioVar, nearPlane, farPlane);
+			worldViewProectionMatrix = viewMatrix * projectionMatrix;
 		}
 
 		Matrix GetViewMatrix() const 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Vector3.h"
 #include "Vector4.h"
-
+#include "DirectXMath.h"
 namespace dae {
 	struct Matrix
 	{
@@ -17,7 +17,7 @@ namespace dae {
 			const Vector4& yAxis,
 			const Vector4& zAxis,
 			const Vector4& t);
-
+		Matrix(const DirectX::XMMATRIX& m);
 		Matrix(const Matrix& m);
 
 		Vector3 TransformVector(const Vector3& v) const;

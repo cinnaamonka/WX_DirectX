@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <fstream>
 #include "Math.h"
 #include "Mesh.h"
@@ -13,6 +12,7 @@ namespace dae
 #pragma warning(disable : 4505) //Warning unreferenced local function
 		static bool ParseOBJ(const std::string& filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, bool flipAxisAndWinding = true)
 		{
+			int counter = 0;
 			std::ifstream file(filename);
 			if (!file)
 				return false;
@@ -70,6 +70,8 @@ namespace dae
 					size_t iPosition, iTexCoord, iNormal;
 
 					uint32_t tempIndices[3];
+					
+
 					for (size_t iFace = 0; iFace < 3; iFace++)
 					{
 						// OBJ format uses 1-based arrays
@@ -92,6 +94,7 @@ namespace dae
 								file.ignore();
 
 								// Optional vertex normal
+								counter++;
 								file >> iNormal;
 								vertex.normal = normals[iNormal - 1];
 							}
@@ -103,7 +106,7 @@ namespace dae
 					}
 
 					indices.push_back(tempIndices[0]);
-					if (flipAxisAndWinding) 
+					if (flipAxisAndWinding)
 					{
 						indices.push_back(tempIndices[2]);
 						indices.push_back(tempIndices[1]);
@@ -115,9 +118,9 @@ namespace dae
 					}
 				}
 				//read till end of line and ignore all remaining chars
-				file.ignore(1000, '\n');
+				//file.ignore(1000, '\n');
 			}
-
+			std::cout << counter << std::endl;
 			//Cheap Tangent Calculations
 			for (uint32_t i = 0; i < indices.size(); i += 3)
 			{
@@ -149,7 +152,7 @@ namespace dae
 			{
 				v.tangent = Vector3::Reject(v.tangent, v.normal).Normalized();
 
-				if(flipAxisAndWinding)
+				if (flipAxisAndWinding)
 				{
 					v.position.z *= -1.f;
 					v.normal.z *= -1.f;
