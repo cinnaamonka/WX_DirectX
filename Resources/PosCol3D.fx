@@ -42,7 +42,7 @@ struct VS_INPUT
     float3 normal : NORMAL;
     float3 tangent : TANGENT;
     
- };
+};
 
 struct VS_OUTPUT
 {
@@ -56,7 +56,7 @@ struct VS_OUTPUT
 
 
 VS_OUTPUT VS(VS_INPUT input)
-{   
+{
     VS_OUTPUT output = (VS_OUTPUT) 0;
     output.Position = mul(float4(input.Position, 1.f), worldMatrix);
     output.normal = mul(input.normal, (float3x3) worldMatrix);
@@ -72,7 +72,7 @@ VS_OUTPUT VS(VS_INPUT input)
 }
 VS_OUTPUT VS_FireFX(VS_INPUT input)
 {
-    VS_OUTPUT output = (VS_OUTPUT)0;
+    VS_OUTPUT output = (VS_OUTPUT) 0;
     
     output.Position = mul(float4(input.Position, 1.0f), worldViewProjection);
     
@@ -91,7 +91,7 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 	//normal mapping
     float3 binormal = cross(input.normal, input.tangent);
     float3x3 tangentSpaceAxis = float3x3(input.tangent, binormal, input.normal);
-    float3 sampledNormalColor = gNormalMap.Sample(samPoint, input.uv).rgb; 
+    float3 sampledNormalColor = gNormalMap.Sample(samPoint, input.uv).rgb;
 
     sampledNormalColor = 2 * sampledNormalColor - 1;
 
@@ -196,11 +196,53 @@ float4 PS_FireFX(VS_OUTPUT input) : SV_TARGET
     float4 color = gDiffuseMap.Sample(samPoint, input.uv);
     return color;
 }
+BlendState gBlendState
+{
+    BlendEnable[0] = false; 
+    SrcBlend = one; 
+    DestBlend = zero; 
+    BlendOp = add; 
+    SrcBlendAlpha = one; 
+    DestBlendAlpha = zero; 
+    BlendOpAlpha = add; 
+    RenderTargetWriteMask[0] = 0x0F; 
+};
 
+RasterizerState gRasterizerState
+{
+    CullMode = none;
+    FrontCounterClockwise = false;
+};
+
+DepthStencilState gDepthStencilState
+{
+    DepthEnable = true;
+    DepthWriteMask = ALL;
+    DepthFunc = less;
+    StencilEnable = false;
+
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0xFF;
+
+    FrontFaceStencilFunc = always;
+    BackFaceStencilFunc = always;
+
+    FrontFaceStencilDepthFail = keep;
+    BackFaceStencilDepthFail = keep;
+
+    FrontFaceStencilPass = keep;
+    BackFaceStencilPass = keep;
+
+    FrontFaceStencilFail = keep;
+    BackFaceStencilFail = keep;
+};
 technique11 DefaultTechnique
 {
     pass P0
     {
+        SetRasterizerState(gRasterizerState);
+        SetDepthStencilState(gDepthStencilState, 0);
+        SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetVertexShader(CompileShader(vs_5_0, VS()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_Point()));

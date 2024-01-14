@@ -29,7 +29,47 @@ SamplerState samAnisotropic
     AddressU = Wrap;
     AddressV = Wrap;
 };
+BlendState gBlendState
+{
+    BlendEnable[0] = true;
+    SrcBlend = src_alpha;
+    DestBlend = inv_src_alpha;
+    BlendOp = add;
+    SrcBlendAlpha = zero;
+    DestBlendAlpha = zero; 
+    BlendOpAlpha = add; 
+    RenderTargetWriteMask[0] = 0x0F; 
+};
+RasterizerState gRasterizerState
+{
+    CullMode = none;
+    FrontCounterClockwise = false;
+};
+DepthStencilState gDepthStencilState
+{
+    DepthEnable = true;
+    DepthWriteMask = zero;
+    DepthFunc = less;
+    StencilEnable = false;
 
+    //others are redundant because
+    // StencilEnable is FALSE
+    // (for demo purposes only)
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0xFF;
+
+    FrontFaceStencilFunc = always;
+    BackFaceStencilFunc = always;
+
+    FrontFaceStencilDepthFail = keep;
+    BackFaceStencilDepthFail = keep;
+
+    FrontFaceStencilPass = keep;
+    BackFaceStencilPass = keep;
+
+    FrontFaceStencilFail = keep;
+    BackFaceStencilFail = keep;
+};
 
 struct VS_INPUT
 {
@@ -64,6 +104,9 @@ technique11 FireEffectTechnique
 {
     pass P0
     {
+        SetRasterizerState(gRasterizerState);
+        SetDepthStencilState(gDepthStencilState, 0);
+        SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetVertexShader(CompileShader(vs_5_0, VS_FireFX())); 
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_FireFX())); 
