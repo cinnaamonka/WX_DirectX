@@ -3,11 +3,11 @@
 #include "Effect.h"
 namespace dae
 {
-	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices):
+	Mesh::Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices,std::wstring path, std::string techiqueName):
 		m_pVertexBuffer(nullptr), m_pInputLayout(nullptr)
 	{
-		// Create Effect
-		m_pEffect = new Effect(pDevice, L"./Resources/PosCol3D.fx");
+		
+		m_pEffect = new EffectBase(pDevice, path, techiqueName);
 
 		m_pDiffuseVariable = m_pEffect->GetVariableByName("gDiffuseMap")->AsShaderResource();
 

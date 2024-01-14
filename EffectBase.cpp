@@ -6,7 +6,7 @@
 namespace dae
 {
 
-	EffectBase::EffectBase(ID3D11Device* pDevice, const std::wstring& assetFile)
+	EffectBase::EffectBase(ID3D11Device* pDevice, const std::wstring& assetFile,std::string techiqueName)
 	{
 		const std::ifstream asset(assetFile);
 
@@ -17,7 +17,11 @@ namespace dae
 
 		m_pEffect = LoadEffect(pDevice, assetFile);
 
-		m_pTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
+		const auto& name = CreateLPSTRFromConstCharArray(techiqueName.c_str());
+
+		m_pTechnique = m_pEffect->GetTechniqueByName(name);
+
+		delete name;
 
 		if (!m_pTechnique->IsValid())
 		{

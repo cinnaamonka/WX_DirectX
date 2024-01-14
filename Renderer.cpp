@@ -49,8 +49,8 @@ namespace dae {
 			{
 				std::cout << "Object initialization failed!\n";
 			}
-			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices);
-
+			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices,L"./Resources/PosCol3D.fx","DefaultTechnique");
+		
 			m_pDiffuseTexture = new Texture(); 
 			m_pDiffuseTexture->LoadFromFile("Resources/vehicle_diffuse.png", m_pDevice);
 			m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
@@ -70,9 +70,10 @@ namespace dae {
 			m_pNormalTexture->LoadFromFile("Resources/vehicle_normal.png", m_pDevice);
 			m_pMesh->SetNormalMap(m_pNormalTexture);
 
+			// loading everything for fire mesh
 			m_pFireTexture = new Texture();
 			m_pFireTexture->LoadFromFile("Resources/fireFX_diffuse.png", m_pDevice);
-			m_pFireFXMesh = new Mesh(m_pDevice, fireFx_vertices, fireFx_indices);
+			m_pFireFXMesh = new Mesh(m_pDevice, fireFx_vertices, fireFx_indices, L"./Resources/FireShader.fx","FireEffectTechnique");
 			m_pFireFXMesh->SetDiffuseMap(m_pFireTexture);
 		}
 		else
@@ -144,7 +145,7 @@ namespace dae {
 			const float angle = PI_DIV_2 * pTimer->GetTotal();
 
 			m_pMesh->RotateY(angle);
-			//m_pFireFXMesh->RotateY(angle);
+			m_pFireFXMesh->RotateY(angle);
 
 		}
 	}
@@ -166,7 +167,7 @@ namespace dae {
 		auto viewProjectionMatrix = worldMatrix * m_pCamera->worldViewProectionMatrix;
 		
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
-		//m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
+		m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}

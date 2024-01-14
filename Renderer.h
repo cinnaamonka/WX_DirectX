@@ -42,9 +42,8 @@ namespace dae
 			Linear,
 			Anisotropic
 		};
-
 		SamplerState m_SampleState = SamplerState::Point;
-
+		
 		bool m_IsInitialized = false;
 		bool m_CanBeRotated = false;
 
@@ -57,7 +56,7 @@ namespace dae
 		ID3D11DepthStencilView* m_pDepthStencilView;
 		ID3D11Texture2D* m_pRenderTargetBuffer;
 		ID3D11RenderTargetView* m_pRenderTargetView;
-		Mesh* m_pMesh;
+		Mesh* m_pMesh = nullptr;
 		Mesh* m_pFireFXMesh = nullptr;
 		Camera* m_pCamera;
 

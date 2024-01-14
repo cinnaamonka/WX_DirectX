@@ -19,7 +19,7 @@ namespace dae
 
 	class Mesh
 	{
-		Effect* m_pEffect;
+		EffectBase* m_pEffect;
 		ID3D11Buffer* m_pVertexBuffer;
 		ID3D11InputLayout* m_pInputLayout;
 		int m_NumIndices;
@@ -34,7 +34,7 @@ namespace dae
 
 	public:
 		Mesh() = default;
-		Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
+		Mesh(ID3D11Device* pDevice, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices,std::wstring path,std::string techiqueName);
 		~Mesh();
 	
 		bool SetDiffuseMap(Texture* pDiffuseTexture);
