@@ -51,27 +51,27 @@ namespace dae
 		       
 		vertexDesc[0].SemanticName = "POSITION";
 		vertexDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[0].AlignedByteOffset = 0;
+		vertexDesc[0].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		vertexDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[1].SemanticName = "COLOR";
 		vertexDesc[1].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[1].AlignedByteOffset = 12;
+		vertexDesc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		vertexDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[2].SemanticName = "TEXCOORD";
 		vertexDesc[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-		vertexDesc[2].AlignedByteOffset = 24;
+		vertexDesc[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		vertexDesc[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[3].SemanticName = "NORMAL";
 		vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[3].AlignedByteOffset = 36; // Adjust the offset based on your structure
+		vertexDesc[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT; // Adjust the offset based on your structure
 		vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[4].SemanticName = "TANGENT";
 		vertexDesc[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[4].AlignedByteOffset = 48; // Adjust the offset based on your structure
+		vertexDesc[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT; // Adjust the offset based on your structure
 		vertexDesc[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		// Create Vertex Buffer

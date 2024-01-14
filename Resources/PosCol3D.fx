@@ -98,7 +98,7 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
     float3 resultNormal = normalize(mul(sampledNormalColor, tangentSpaceAxis));
 
 
-    float cosAngle = dot(resultNormal, normalize(gLightDirection));
+    float cosAngle = dot(resultNormal, normalize(-gLightDirection));
  	// lambert diffuse
 
     float4 sampleDiffuse = gDiffuseMap.Sample(samPoint, input.uv);
