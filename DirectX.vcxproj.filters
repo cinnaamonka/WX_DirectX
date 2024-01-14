@@ -54,6 +54,9 @@
     <ClInclude Include="FireEffect.h">
       <Filter>Misc</Filter>
     </ClInclude>
+    <ClInclude Include="EffectBase.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -84,6 +87,9 @@
       <Filter>Misc</Filter>
     </ClCompile>
     <ClCompile Include="FireEffect.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectBase.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
   </ItemGroup>

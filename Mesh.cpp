@@ -156,9 +156,6 @@ namespace dae
 
 	Mesh::~Mesh()
 	{
-		
-
-		// Release Shader Resource Variables
 		if (m_pDiffuseVariable)
 		{
 			m_pDiffuseVariable->Release();
@@ -209,7 +206,6 @@ namespace dae
 			m_pEffect = nullptr;
 		}
 	}
-
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext, const Matrix* viewProjectionMatrix, const Matrix* worldMatrix) const
 	{

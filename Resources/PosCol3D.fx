@@ -97,7 +97,6 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 
     float3 resultNormal = normalize(mul(sampledNormalColor, tangentSpaceAxis));
 
-
     float cosAngle = dot(resultNormal, normalize(-gLightDirection));
  	// lambert diffuse
 
@@ -106,16 +105,15 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 
   
 	// phong 
-    float3 reflection = reflect(-normalize(gLightDirection), resultNormal);
+    float3 reflection = reflect(normalize(gLightDirection), resultNormal);
     float cosAlpha = max(dot(reflection, input.ViewDirection), 0.0f);
     sampledSpecular = gSpecularMap.Sample(samPoint, input.uv);
     sampledPhongExponent = gGlossinessMap.Sample(samPoint, input.uv);
 
     float4 specularColor = sampledSpecular * pow(cosAlpha, sampledPhongExponent * gShininess);
+  
    
-    if (cosAngle < 0) return 0;
-   
-    return (lambertDiffuse + specularColor + ambientOcclusion) * cosAngle; 
+    return (lambertDiffuse + specularColor + ambientOcclusion) * cosAngle;
 };
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
 {
