@@ -199,7 +199,12 @@ namespace dae
 			m_pIndexBuffer = nullptr;
 		}
 
-		// Release Effect resources
+		if (m_CameraOrigin)
+		{
+			m_CameraOrigin->Release();
+			m_CameraOrigin = nullptr;
+		}
+	
 		if (m_pEffect)
 		{
 			delete m_pEffect;

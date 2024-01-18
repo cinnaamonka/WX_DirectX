@@ -64,6 +64,6 @@ namespace dae
 		Texture* m_pSpecularTexture;
 		Texture* m_pGlossinessTexture;
 		Texture* m_pNormalTexture;
-		Texture* m_pFireTexture;
+		std::unique_ptr<Texture> m_pFireTexture;
 	};
 }

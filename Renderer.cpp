@@ -8,10 +8,11 @@
 namespace dae {
 
 	Renderer::Renderer(SDL_Window* pWindow, Camera* pCamera) :
-		m_pWindow(pWindow), m_pCamera(pCamera)
+		m_pWindow(pWindow)
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
+		m_pCamera = new Camera(pCamera->origin, pCamera->fovAngle);
 		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), 45.f, Vector3{ 0.0f, 0.0f ,-50.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
@@ -19,21 +20,6 @@ namespace dae {
 		{
 			m_IsInitialized = true;
 			std::cout << "DirectX is initialized and ready!\n";
-			// test
-			/*std::vector<Vertex> vertices = 
-			{
-					{{-3,  3, -2}, {}, {0, 0}},
-					{{ 3,  3, -2}, {}, {1, 0}},
-					{{-3, -3, -2}, {}, {0, 1}},
-					{{ 3, -3, -2}, {}, {1, 1}}
-			};
-			std::vector<uint32_t> indices{ 0, 1,  2, 2, 1, 3 };
-		
-			m_pMesh = new Mesh(m_pDevice, vertices, indices);
-
-			m_pMyTexture = new Texture();
-			m_pMyTexture->LoadFromFile("Resources/uv_grid_2.png", m_pDevice);
-			m_pMesh->SetDiffuseMap(m_pMyTexture);*/
 
 			std::vector<Vertex>   vehicle_vertices{};
 			std::vector<uint32_t> vehicle_indices{};
@@ -49,9 +35,15 @@ namespace dae {
 			{
 				std::cout << "Object initialization failed!\n";
 			}
-			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices,L"./Resources/PosCol3D.fx","DefaultTechnique");
-		
-			m_pDiffuseTexture = new Texture(); 
+			m_pMesh = new Mesh(m_pDevice, vehicle_vertices, vehicle_indices, L"./Resources/PosCol3D.fx", "DefaultTechnique");
+			m_pFireFXMesh = new Mesh(m_pDevice, fireFx_vertices, fireFx_indices, L"./Resources/FireShader.fx", "FireEffectTechnique");
+
+			// loading everything for fire mesh
+			m_pFireTexture = std::make_unique<Texture>(); 
+			m_pFireTexture->LoadFromFile("Resources/fireFX_diffuse.png", m_pDevice);
+			m_pFireFXMesh->SetDiffuseMap(m_pFireTexture.get());
+
+			m_pDiffuseTexture = new Texture();
 			m_pDiffuseTexture->LoadFromFile("Resources/vehicle_diffuse.png", m_pDevice);
 			m_pMesh->SetDiffuseMap(m_pDiffuseTexture);
 
@@ -70,34 +62,37 @@ namespace dae {
 			m_pNormalTexture->LoadFromFile("Resources/vehicle_normal.png", m_pDevice);
 			m_pMesh->SetNormalMap(m_pNormalTexture);
 
-			// loading everything for fire mesh
-			m_pFireTexture = new Texture();
-			m_pFireTexture->LoadFromFile("Resources/fireFX_diffuse.png", m_pDevice);
-			m_pFireFXMesh = new Mesh(m_pDevice, fireFx_vertices, fireFx_indices, L"./Resources/FireShader.fx","FireEffectTechnique");
-			m_pFireFXMesh->SetDiffuseMap(m_pFireTexture);
 		}
 		else
 		{
 			std::cout << "DirectX initialization failed!\n";
 		}
-	}
 
+	}
 	Renderer::~Renderer()
 	{
 
 		if (m_pRenderTargetView) m_pRenderTargetView->Release();
-		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
 		if (m_pDepthStencilView) m_pDepthStencilView->Release();
+
+		if (m_pRenderTargetBuffer) m_pRenderTargetBuffer->Release();
 		if (m_pDepthStencilBuffer) m_pDepthStencilBuffer->Release();
+
 		if (m_pSwapChain) m_pSwapChain->Release();
-		if (m_pDeviceContext)
+
+		if (m_pDeviceContext) 
 		{
 			m_pDeviceContext->ClearState();
 			m_pDeviceContext->Flush();
 			m_pDeviceContext->Release();
 		}
-		if (m_pDevice) m_pDevice->Release();
 
+		if (m_pDevice) m_pDevice->Release();
+		if (m_pCamera)
+		{
+			delete m_pCamera;
+			m_pCamera = nullptr;
+		}
 		if (m_pNormalTexture)
 		{
 			delete m_pNormalTexture;
@@ -118,11 +113,7 @@ namespace dae {
 			delete m_pGlossinessTexture;
 			m_pGlossinessTexture = nullptr;
 		}
-		if (m_pFireTexture)
-		{
-			delete m_pFireTexture;
-			m_pFireTexture = nullptr;
-		}
+		
 		if (m_pMesh)
 		{
 			delete m_pMesh;
@@ -163,9 +154,9 @@ namespace dae {
 
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
 		const auto worldMatrix = m_pMesh->GetWorldMatrix();
-		
+
 		auto viewProjectionMatrix = worldMatrix * m_pCamera->worldViewProectionMatrix;
-		
+
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 		m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 		//// 3. PRESENT BACKBUFFER (SWAP)

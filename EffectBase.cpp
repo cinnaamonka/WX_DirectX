@@ -21,7 +21,7 @@ namespace dae
 
 		m_pTechnique = m_pEffect->GetTechniqueByName(name);
 
-		delete name;
+		delete[] name;
 
 		if (!m_pTechnique->IsValid())
 		{
@@ -42,8 +42,6 @@ namespace dae
 		{
 			std::wcout << L"World matrix is not valid" << std::endl;
 		}
-
-
 	}
 
 	EffectBase::~EffectBase()
@@ -64,6 +62,7 @@ namespace dae
 
 		m_pEffect->Release();
 		m_pEffect = nullptr;
+
 	}
 	ID3DX11EffectVariable* EffectBase::GetVariableByName(const std::string& name) const
 	{
