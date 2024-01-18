@@ -44,9 +44,9 @@ namespace dae
 			std::wcout << L"m_CameraOrigin is not valid" << std::endl;
 		}
 
-		// Create Vertex Layout
-		// Create Vertex Layout
-		static constexpr uint32_t numElements{ 5 }; // Update to include normal and tangent
+		m_IsNormalMapEnabled = m_pEffect->GetVariableByName("gNormalMapEnabled")->AsScalar();
+
+		static constexpr uint32_t numElements{ 5 };
 		D3D11_INPUT_ELEMENT_DESC vertexDesc[numElements]{};
 		       
 		vertexDesc[0].SemanticName = "POSITION";
@@ -66,12 +66,12 @@ namespace dae
 
 		vertexDesc[3].SemanticName = "NORMAL";
 		vertexDesc[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT; // Adjust the offset based on your structure
+		vertexDesc[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		vertexDesc[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		vertexDesc[4].SemanticName = "TANGENT";
 		vertexDesc[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		vertexDesc[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT; // Adjust the offset based on your structure
+		vertexDesc[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT; 
 		vertexDesc[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 
 		// Create Vertex Buffer
@@ -204,7 +204,11 @@ namespace dae
 			m_CameraOrigin->Release();
 			m_CameraOrigin = nullptr;
 		}
-	
+		if (m_IsNormalMapEnabled)
+		{
+			m_IsNormalMapEnabled->Release();
+			m_IsNormalMapEnabled = nullptr;
+		}
 		if (m_pEffect)
 		{
 			delete m_pEffect;

@@ -59,13 +59,25 @@ int main(int argc, char* args[])
 				isLooping = false;
 				break;
 			case SDL_KEYUP:
-				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
+				if (e.key.keysym.scancode == SDL_SCANCODE_F4)
 				{
 					pRenderer->CycleSamplerState();
 				}
 				if (e.key.keysym.scancode == SDL_SCANCODE_F5)
 				{
 					pRenderer->RotateModel();
+				}
+				if (e.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+				{
+					pRenderer->IncreaseCameraSpeed();
+				}
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+				{
+					pRenderer->ToggleNormalMap();
+				}
+				if (e.key.keysym.scancode == SDL_SCANCODE_F7)
+				{
+					pRenderer->ToggleFireMeshVisibility();
 				}
 				break;
 			default:;

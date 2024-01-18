@@ -13,7 +13,7 @@ namespace dae {
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 		m_pCamera = new Camera(pCamera->origin, pCamera->fovAngle);
-		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), 45.f, Vector3{ 0.0f, 0.0f ,-50.0f });
+		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), m_ShouldSpeedBeIncreased, 45.f, Vector3{ 0.0f, 0.0f ,-50.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
 		if (result == S_OK)
@@ -133,12 +133,13 @@ namespace dae {
 
 		if (m_CanBeRotated)
 		{
-			const float angle = PI_DIV_2 * pTimer->GetTotal();
+			const float angle = PI_DIV_4 * pTimer->GetTotal();
 
 			m_pMesh->RotateY(angle);
 			m_pFireFXMesh->RotateY(angle);
 
 		}
+		
 	}
 
 
@@ -148,7 +149,7 @@ namespace dae {
 			return;
 
 		// 1. CLEAR RTV & DSV
-		constexpr float color[4] = { 0.f, 0.f, 0.3f, 1.f };
+		constexpr float color[4] = { 0.39f, 0.59f, 0.93f, 1.f };
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, color);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
@@ -158,9 +159,31 @@ namespace dae {
 		auto viewProjectionMatrix = worldMatrix * m_pCamera->worldViewProectionMatrix;
 
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
-		m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
+
+		if (m_FireMeshShouldBeShown)
+		{
+			m_pFireFXMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
+		}
+		
 		//// 3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
+	}
+
+	std::string Renderer::ConvertSamplerStateToString(SamplerState state)
+	{
+		{
+			switch (state)
+			{
+			case SamplerState::Point:
+				return "Point";
+			case SamplerState::Linear:
+				return "Linear";
+			case SamplerState::Anisotropic:
+				return "Anisotropic";
+			default:
+				return "Unknown";
+			}
+		}
 	}
 
 	HRESULT Renderer::InitializeDirectX()
@@ -262,5 +285,10 @@ namespace dae {
 	{
 		m_SampleState = static_cast<SamplerState>((static_cast<int>(m_SampleState) + 1) % 3);
 		m_pMesh->SetSampleState(static_cast<UINT>(m_SampleState));
+
+		SamplerState state = m_SampleState;
+		std::string stateStr = ConvertSamplerStateToString(state);
+
+		std::cout << "Current texture sampling state is: " << stateStr << std::endl;
 	}
 }

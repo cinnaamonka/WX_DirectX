@@ -29,7 +29,7 @@ namespace dae
 
 
 		float nearPlane = 0.1f;
-		float farPlane = 100.f;
+		float farPlane = 1000.f;
 
 		Matrix projectionMatrix{};
 		Matrix invViewMatrix{};
@@ -38,27 +38,23 @@ namespace dae
 		Matrix worldMatrix{};
 		float aspectRatioVar{};
 
-		void Initialize(float aspectRatio, float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f })
+		bool canScoreBeIncreased = false;
+
+		void Initialize(float aspectRatio, bool canSpeedBeIncreased, float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f })
 		{
 			fovAngle = _fovAngle;
 			fov = tanf((fovAngle * TO_RADIANS) / 2.f);
 			aspectRatioVar = aspectRatio;
 			origin = _origin;
 			worldMatrix = CalculateCameraToWorld();
+			canScoreBeIncreased = canSpeedBeIncreased;
 		}
 
 		void CalculateViewMatrix()
 		{
-			// ONB - CameraToWorldMatrix
-			//ONB => invViewMatrix
-
 			viewMatrix = CalculateCameraToWorld();
 
-			//Inverse(ONB) => ViewMatrix
 			invViewMatrix = viewMatrix.Inverse();
-
-			//ViewMatrix => Matrix::CreateLookAtLH(...) [not implemented yet]
-			//viewMatrix = Matrix::CreateLookAtLH(origin, forward, up);
 		}
 
 		void CalculateProjectionMatrix()
@@ -96,7 +92,18 @@ namespace dae
 		void Update(const Timer* pTimer)
 		{
 			const float deltaTime = pTimer->GetElapsed();
-			const float step = 15.0f;
+
+			float step = 0;
+
+			if (canScoreBeIncreased)
+			{
+			     step = 10.0f;
+			}
+			else
+			{
+				step = 200.0f;
+			}
+		
 
 			const Vector3 movementDirection{};
 
@@ -174,9 +181,8 @@ namespace dae
 
 			forward = rotMat.TransformVector(Vector3::UnitZ);
 
-			//Update Matrices
 			CalculateViewMatrix();
-			CalculateProjectionMatrix(); //Try to optimize this - should only be called once or when fov/aspectRatio changes
+			CalculateProjectionMatrix();
 		}
 	
 	};
