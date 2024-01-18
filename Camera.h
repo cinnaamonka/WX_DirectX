@@ -11,83 +11,83 @@ namespace dae
 	struct Camera
 	{
 		Camera(const Vector3& _origin, float _fovAngle) :
-			m_CameraOrigin{ _origin },
-			m_FovAngle{ _fovAngle }
+			cameraOrigin{ _origin },
+			fovAngle{ _fovAngle }
 		{
 		}
 
-		Vector3 m_CameraOrigin = {};
-		float m_FovAngle = 45.f;
+		Vector3 cameraOrigin = {};
+		float fovAngle = 45.f;
 
-		Vector3 m_Forward = { Vector3::UnitZ };
-		Vector3 m_Up = { Vector3::UnitY };
-		Vector3 m_Right{ Vector3::UnitX };
+		Vector3 forward = { Vector3::UnitZ };
+		Vector3 up = { Vector3::UnitY };
+		Vector3 right{ Vector3::UnitX };
 
 		float totalPitch = {};
 		float totalYaw = {};
 
 
-		float m_NearPlane = 0.1f;
-		float m_FarPlane = 1000.f;
+		float nearPlane = 0.1f;
+		float farPlane = 1000.f;
 
-		Matrix m_ProjectionMatrix = {};
-		Matrix m_InvViewMatrix = {};
-		Matrix m_ViewMatrix{};
-		Matrix m_WorldViewProjectionMatrix{};
-		Matrix m_WorldMatrix{};
-		float m_AspectRatioVar{};
+		Matrix projectionMatrix = {};
+		Matrix invViewMatrix = {};
+		Matrix viewMatrix{};
+		Matrix worldViewProjectionMatrix{};
+		Matrix worldMatrix{};
+		float aspectRatioVar{};
 
-		bool m_CanScoreBeIncreased = false;
+		bool canScoreBeIncreased = false;
 
 		void Initialize(float aspectRatio, bool canSpeedBeIncreased, float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f })
 		{
-			m_FovAngle = _fovAngle;
-			m_AspectRatioVar = aspectRatio;
-			m_CameraOrigin = _origin;
-			m_WorldMatrix = CalculateCameraToWorld();
-			m_CanScoreBeIncreased = canSpeedBeIncreased;
+			fovAngle = _fovAngle;
+			aspectRatioVar = aspectRatio;
+			cameraOrigin = _origin;
+			worldMatrix = CalculateCameraToWorld();
+			canScoreBeIncreased = canSpeedBeIncreased;
 		}
 
 		void CalculateViewMatrix()
 		{
-			m_ViewMatrix = CalculateCameraToWorld();
+			viewMatrix = CalculateCameraToWorld();
 
-			m_InvViewMatrix = m_ViewMatrix.Inverse();
+			invViewMatrix = viewMatrix.Inverse();
 		}
 		void ChangeMovementSpeed(bool canSpeedBeIncreased)
 		{
-			m_CanScoreBeIncreased = canSpeedBeIncreased;
+			canScoreBeIncreased = canSpeedBeIncreased;
 		}
 		void CalculateProjectionMatrix()
 		{
 			//TODO W3
 
-			m_ProjectionMatrix = Matrix::CreatePerspectiveFovLH(m_FovAngle, m_AspectRatioVar, m_NearPlane, m_FarPlane);
-			m_WorldViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
+			projectionMatrix = Matrix::CreatePerspectiveFovLH(fovAngle, aspectRatioVar, nearPlane, farPlane);
+			worldViewProjectionMatrix = viewMatrix * projectionMatrix;
 		}
 
 		Matrix GetViewMatrix() const 
 		{
-			return m_ViewMatrix;
+			return viewMatrix;
 		}
 		Matrix ViewProjectionMatrix() const 
 		{
-			return m_WorldViewProjectionMatrix;
+			return worldViewProjectionMatrix;
 		}
-		const Vector3& GetOrigin() const { return m_CameraOrigin; }
+		const Vector3& GetOrigin() const { return cameraOrigin; }
 		Matrix CalculateCameraToWorld()
 		{
-			m_Right = Vector3::Cross(Vector3::UnitY, m_Forward).Normalized();
-			m_Up = Vector3::Cross(m_Forward, m_Right).Normalized();
+			right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
+			up = Vector3::Cross(forward, right).Normalized();
 
-			m_WorldMatrix = { m_Right,m_Up,m_Forward,m_CameraOrigin };
+			worldMatrix = { right,up,forward,cameraOrigin };
 
 			return
 			{
-				m_Right,
-				m_Up,
-				m_Forward,
-				m_CameraOrigin
+				right,
+				up,
+				forward,
+				cameraOrigin
 			};
 		}
 		void Update(const Timer* pTimer)
@@ -97,7 +97,7 @@ namespace dae
 			float step = 0;
 			float rotationSpeed;
 
-			if (!m_CanScoreBeIncreased)
+			if (!canScoreBeIncreased)
 			{
 			     step = 10.0f;
 				 rotationSpeed = 20.f;
@@ -117,20 +117,20 @@ namespace dae
 
 			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_UP])
 			{
-				m_CameraOrigin += (step * deltaTime) * m_Forward.Normalized();
+				cameraOrigin += (step * deltaTime) * forward.Normalized();
 			}
 			if (pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_DOWN])
 			{
-				m_CameraOrigin -= (step * deltaTime) * m_Forward.Normalized();
+				cameraOrigin -= (step * deltaTime) * forward.Normalized();
 			}
 			if (pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_RIGHT])
 			{
 
-				m_CameraOrigin += (step * deltaTime) * m_Right.Normalized();
+				cameraOrigin += (step * deltaTime) * right.Normalized();
 			}
 			if (pKeyboardState[SDL_SCANCODE_A] || pKeyboardState[SDL_SCANCODE_LEFT])
 			{
-				m_CameraOrigin -= (step * deltaTime) * m_Right.Normalized();
+				cameraOrigin -= (step * deltaTime) * right.Normalized();
 			}
 
 			//Mouse Input
@@ -158,7 +158,7 @@ namespace dae
 			//LMB + Mouse Move Y
 			if (isLeftMousePressed && mouseY)
 			{
-				m_CameraOrigin -= step * deltaTime * m_Forward.Normalized() * static_cast<float>(mouseY);
+				cameraOrigin -= step * deltaTime * forward.Normalized() * static_cast<float>(mouseY);
 			}
 			//LMB + Mouse Move X
 			if (isLeftMousePressed && mouseX)
@@ -168,19 +168,19 @@ namespace dae
 			//(LMB + RMB + Mouse Move Y)
 			if (areBothButtonsPressed && mouseY)
 			{
-				m_CameraOrigin += step * deltaTime * m_Up.Normalized() * static_cast<float>(mouseY);
+				cameraOrigin += step * deltaTime * up.Normalized() * static_cast<float>(mouseY);
 			}
 
 			const Matrix cameraToWorld = this->CalculateCameraToWorld();
 
-			m_CameraOrigin += cameraToWorld.TransformVector(movementDirection) * deltaTime;
+			cameraOrigin += cameraToWorld.TransformVector(movementDirection) * deltaTime;
 
 			const Matrix rotMat
 			{
 			Matrix::CreateRotation(totalPitch,totalYaw, 0.f)
 			};
 
-			m_Forward = rotMat.TransformVector(Vector3::UnitZ);
+			forward = rotMat.TransformVector(Vector3::UnitZ);
 
 			CalculateViewMatrix();
 			CalculateProjectionMatrix();
