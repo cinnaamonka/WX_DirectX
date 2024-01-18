@@ -28,20 +28,23 @@ namespace dae
 		void Update(const Timer* pTimer);
 		void Render() const;
 		void CycleSamplerState();
+
 		void RotateModel()
 		{
 			m_CanBeRotated = !m_CanBeRotated;
+		}
 
-		};
 		void IncreaseCameraSpeed()
 		{
 			m_ShouldSpeedBeIncreased = !m_ShouldSpeedBeIncreased;
 		}
+
 		void ToggleNormalMap()
 		{
 			m_ModelShouldBeRotated = !m_ModelShouldBeRotated;
 			m_pMesh->ToggleNormalMap(m_ModelShouldBeRotated);
 		}
+
 		void ToggleFireMeshVisibility()
 		{
 			m_FireMeshShouldBeShown = !m_FireMeshShouldBeShown;
@@ -60,11 +63,11 @@ namespace dae
 			Anisotropic,
 			Count
 		};
+
 		SamplerState m_SampleState = SamplerState::Point;
 
 		std::string ConvertSamplerStateToString(SamplerState state);
 		
-
 		bool m_IsInitialized = false;
 		bool m_CanBeRotated = false;
 

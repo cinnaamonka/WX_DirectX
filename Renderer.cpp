@@ -12,7 +12,7 @@ namespace dae {
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
-		m_pCamera = new Camera(pCamera->origin, pCamera->fovAngle);
+		m_pCamera = new Camera(pCamera->m_CameraOrigin, pCamera->m_FovAngle);
 		m_pCamera->Initialize(static_cast<float>(m_Width) / static_cast<float>(m_Height), m_ShouldSpeedBeIncreased, 45.f, Vector3{ 0.0f, 0.0f ,-50.0f });
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
@@ -140,8 +140,8 @@ namespace dae {
 
 		}
 		
+		m_pCamera->ChangeMovementSpeed(m_ShouldSpeedBeIncreased);
 	}
-
 
 	void Renderer::Render() const
 	{
@@ -156,7 +156,7 @@ namespace dae {
 		// 2. SET PIPELINE + INVOKE DRAW CALLS (= RENDER)
 		const auto worldMatrix = m_pMesh->GetWorldMatrix();
 
-		auto viewProjectionMatrix = worldMatrix * m_pCamera->worldViewProectionMatrix;
+		auto viewProjectionMatrix = worldMatrix * m_pCamera->m_WorldViewProjectionMatrix;
 
 		m_pMesh->Render(m_pDeviceContext, &viewProjectionMatrix, &worldMatrix);
 
