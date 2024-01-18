@@ -72,7 +72,6 @@ namespace dae
 		EffectBase* m_pEffect;
 		ID3D11Buffer* m_pVertexBuffer;
 		ID3D11InputLayout* m_pInputLayout;
-		int m_NumIndices;
 		ID3D11Buffer* m_pIndexBuffer;
 		ID3DX11EffectShaderResourceVariable* m_pDiffuseVariable = nullptr;
 		ID3DX11EffectShaderResourceVariable* m_pSpecularVariable = nullptr;
@@ -80,7 +79,6 @@ namespace dae
 		ID3DX11EffectShaderResourceVariable* m_pNormalVariable = nullptr;
 
 		ID3DX11EffectVectorVariable* m_CameraOrigin = nullptr;
-
 
 		UINT m_SampleState;
 		Matrix m_WorldMatrix{};
@@ -90,5 +88,6 @@ namespace dae
 
 		ID3DX11EffectVariable* m_IsNormalMapEnabled;
 
+		int m_NumIndices;
 	};
 }
